@@ -1,16 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
 #                         # Código da Aula 14/05 
 import streamlit as st
 import seaborn as sn
