@@ -680,6 +680,7 @@ html, body, [class*="css"] {
     padding: 1.7rem;
     transition: 0.35s ease;
     box-shadow: 0 0 30px rgba(0,229,255,0.04);
+     margin-bottom: 2rem;
 }
  
 .kpi-card:hover {
