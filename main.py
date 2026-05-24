@@ -797,7 +797,12 @@ footer {visibility: hidden;}
 header {visibility: hidden;}
 [data-testid="stSidebarCollapsedControl"] {
     visibility: visible !important;
-}
+    display: block !important;
+    position: fixed !important;
+    top: 14px !important;
+    left: 14px !important;
+    z-index: 999999 !important;
+} 
  
 /* ═══════════════════════════════════════════
    SIDEBAR APRIMORADA
