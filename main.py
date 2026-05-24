@@ -601,11 +601,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-[data-testid="stSidebar"][aria-expanded="false"] {
-    display: block !important;
-    width: 21rem !important;
-    transform: none !important;
-}
+
  
 # ─────────────────────────────────────────────
 # CSS PREMIUM
