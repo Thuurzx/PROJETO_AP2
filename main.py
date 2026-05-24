@@ -1,3 +1,586 @@
+# """
+# Dashboard Financeiro Premium
+# Versão Ultra Moderna
+# """
+
+# import streamlit as st
+# import pandas as pd
+# import seaborn as sn
+# import matplotlib.pyplot as plt
+# import numpy as np
+
+# # ─────────────────────────────────────────────
+# # CONFIGURAÇÃO
+# # ─────────────────────────────────────────────
+# st.set_page_config(
+#     page_title="Dashboard Financeiro",
+#     page_icon="💎",
+#     layout="wide",
+#     initial_sidebar_state="expanded"
+# )
+
+# # ─────────────────────────────────────────────
+# # CSS PREMIUM
+# # ─────────────────────────────────────────────
+# st.markdown("""
+# <style>
+
+# @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap');
+
+# * {
+#     font-family: 'Space Grotesk', sans-serif;
+# }
+
+# /* FUNDO */
+# .stApp {
+
+#     background:
+#         radial-gradient(circle at top left, #111827 0%, #050816 45%),
+#         radial-gradient(circle at bottom right, #0f172a 0%, #020617 40%);
+
+#     color: white;
+#     overflow-x: hidden;
+# }
+
+# /* GRID NO FUNDO */
+# .stApp::before {
+
+#     content: "";
+
+#     position: fixed;
+
+#     width: 100%;
+#     height: 100%;
+
+#     background-image:
+#         linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+#         linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+
+#     background-size: 40px 40px;
+
+#     z-index: -1;
+# }
+
+# /* CURSOR */
+# html, body, [class*="css"] {
+#     cursor: crosshair;
+# }
+
+# /* SIDEBAR */
+# [data-testid="stSidebar"] {
+
+#     background: rgba(17,24,39,0.78);
+
+#     backdrop-filter: blur(20px);
+
+#     border-right: 1px solid rgba(0,229,255,0.15);
+# }
+
+# /* TÍTULO */
+# .main-title {
+
+#     font-size: 3rem;
+#     font-weight: 700;
+
+#     background: linear-gradient(
+#         90deg,
+#         #00e5ff,
+#         #7c3aed,
+#         #00e5ff
+#     );
+
+#     background-size: 200% auto;
+
+#     -webkit-background-clip: text;
+#     -webkit-text-fill-color: transparent;
+
+#     animation: shine 6s linear infinite;
+
+#     margin-bottom: 0;
+# }
+
+# @keyframes shine {
+
+#     to {
+#         background-position: 200% center;
+#     }
+# }
+
+# /* SUBTÍTULO */
+# .main-subtitle {
+
+#     color: #94a3b8;
+
+#     margin-bottom: 2rem;
+
+#     font-size: 1.05rem;
+# }
+
+# /* KPI CARDS */
+# .kpi-card {
+
+#     background: rgba(17,24,39,0.55);
+
+#     border: 1px solid rgba(255,255,255,0.08);
+
+#     backdrop-filter: blur(18px);
+
+#     border-radius: 24px;
+
+#     padding: 1.7rem;
+
+#     transition: 0.35s ease;
+
+#     box-shadow:
+#         0 0 30px rgba(0,229,255,0.04);
+# }
+
+# .kpi-card:hover {
+
+#     transform: translateY(-8px) scale(1.02);
+
+#     border: 1px solid rgba(0,229,255,0.45);
+
+#     box-shadow:
+#         0 0 25px rgba(0,229,255,0.25),
+#         0 0 60px rgba(124,58,237,0.15);
+# }
+
+# /* TEXTO KPI */
+# .kpi-label {
+
+#     color: #94a3b8;
+
+#     font-size: 0.85rem;
+
+#     text-transform: uppercase;
+
+#     letter-spacing: 1px;
+# }
+
+# .kpi-value {
+
+#     font-size: 2.3rem;
+
+#     font-weight: 700;
+
+#     color: white;
+
+#     margin-top: 10px;
+# }
+
+# /* TÍTULOS DE SESSÃO */
+# .section-title {
+
+#     font-size: 1.2rem;
+
+#     font-weight: 600;
+
+#     margin-bottom: 1rem;
+
+#     color: #00e5ff;
+# }
+
+# /* TABS */
+# .stTabs [data-baseweb="tab-list"] {
+
+#     gap: 12px;
+# }
+
+# .stTabs [data-baseweb="tab"] {
+
+#     background: rgba(255,255,255,0.04);
+
+#     border-radius: 14px;
+
+#     padding: 10px 20px;
+
+#     transition: 0.3s;
+# }
+
+# .stTabs [aria-selected="true"] {
+
+#     background: linear-gradient(
+#         90deg,
+#         #00e5ff,
+#         #7c3aed
+#     );
+
+#     color: white !important;
+# }
+
+# /* DATAFRAME */
+# [data-testid="stDataFrame"] {
+
+#     border-radius: 20px;
+
+#     overflow: hidden;
+
+#     border: 1px solid rgba(255,255,255,0.08);
+# }
+
+# /* MULTISELECT PREMIUM */
+# [data-baseweb="select"] > div {
+
+#     background: rgba(2,6,23,0.88) !important;
+
+#     border: 1px solid rgba(255,255,255,0.08) !important;
+
+#     border-radius: 18px !important;
+
+#     min-height: 65px;
+
+#     padding-top: 6px;
+#     padding-bottom: 6px;
+
+#     transition: 0.3s;
+# }
+
+# /* HOVER SELECT */
+# [data-baseweb="select"] > div:hover {
+
+#     border: 1px solid rgba(0,229,255,0.45) !important;
+
+#     box-shadow:
+#         0 0 15px rgba(0,229,255,0.18);
+# }
+
+# /* TAGS */
+# [data-baseweb="tag"] {
+
+#     background: linear-gradient(
+#         135deg,
+#         #7c3aed,
+#         #00e5ff
+#     ) !important;
+
+#     border-radius: 12px !important;
+
+#     border: none !important;
+
+#     color: white !important;
+# }
+
+# /* DROPDOWN */
+# div[role="listbox"] {
+
+#     background: rgba(15,23,42,0.98) !important;
+
+#     border-radius: 18px !important;
+
+#     border: 1px solid rgba(255,255,255,0.08);
+
+#     padding: 8px;
+
+#     backdrop-filter: blur(20px);
+
+#     z-index: 999999 !important;
+# }
+
+# /* ITENS */
+# div[role="option"] {
+
+#     border-radius: 12px;
+
+#     margin-bottom: 4px;
+# }
+
+# /* HOVER DOS ITENS */
+# div[role="option"]:hover {
+
+#     background: rgba(0,229,255,0.12) !important;
+# }
+
+# /* SCROLLBAR */
+# ::-webkit-scrollbar {
+
+#     width: 10px;
+# }
+
+# ::-webkit-scrollbar-thumb {
+
+#     background: linear-gradient(
+#         #00e5ff,
+#         #7c3aed
+#     );
+
+#     border-radius: 20px;
+# }
+
+# /* REMOVE STREAMLIT */
+# #MainMenu {visibility: hidden;}
+# footer {visibility: hidden;}
+# header {visibility: hidden;}
+
+# </style>
+# """, unsafe_allow_html=True)
+
+# # ─────────────────────────────────────────────
+# # CARREGAR DADOS
+# # ─────────────────────────────────────────────
+# @st.cache_data
+# def carregar_dados():
+#     return pd.read_excel("planilhao.xlsx")
+
+# df = carregar_dados()
+
+# # ─────────────────────────────────────────────
+# # SIDEBAR
+# # ─────────────────────────────────────────────
+# st.sidebar.markdown("## ⚡ Filtros Inteligentes")
+
+# setores = st.sidebar.multiselect(
+#     "Setores",
+#     options=sorted(df["setor"].unique()),
+#     default=sorted(df["setor"].unique()),
+#     placeholder="Escolha os setores..."
+# )
+
+# # FILTRO
+# df_filtrado = df[df["setor"].isin(setores)]
+
+# # ─────────────────────────────────────────────
+# # TÍTULO
+# # ─────────────────────────────────────────────
+# st.markdown(
+#     '<div class="main-title">💎 Dashboard Financeiro</div>',
+#     unsafe_allow_html=True
+# )
+
+# st.markdown(
+#     '<div class="main-subtitle">Análise avançada de performance corporativa</div>',
+#     unsafe_allow_html=True
+# )
+
+# # ─────────────────────────────────────────────
+# # KPIs
+# # ─────────────────────────────────────────────
+# c1, c2, c3, c4 = st.columns(4)
+
+# kpis = [
+#     ("Empresas", len(df_filtrado)),
+#     ("Setores", df_filtrado["setor"].nunique()),
+#     ("ROE Médio", f'{df_filtrado["roe"].mean():.2f}%'),
+#     ("ROE Máximo", f'{df_filtrado["roe"].max():.2f}%')
+# ]
+
+# for col, (label, value) in zip([c1, c2, c3, c4], kpis):
+
+#     with col:
+
+#         st.markdown(f"""
+#         <div class="kpi-card">
+#             <div class="kpi-label">{label}</div>
+#             <div class="kpi-value">{value}</div>
+#         </div>
+
+# # ─────────────────────────────────────────────
+# # TABS
+# # ─────────────────────────────────────────────
+# tabs = st.tabs([
+#     "📋 Dados",
+#     "📊 Setores",
+#     "🥧 Distribuição",
+#     "📈 ROE"
+# ])
+
+# # ─────────────────────────────────────────────
+# # TABELA
+# # ─────────────────────────────────────────────
+# with tabs[0]:
+
+#     st.markdown(
+#         '<div class="section-title">Base Financeira</div>',
+#         unsafe_allow_html=True
+#     )
+
+#     st.dataframe(
+#         df_filtrado,
+#         use_container_width=True,
+#         height=520
+#     )
+
+# # ─────────────────────────────────────────────
+# # GRÁFICO DE BARRAS
+# # ─────────────────────────────────────────────
+# with tabs[1]:
+
+#     st.markdown(
+#         '<div class="section-title">Empresas por Setor</div>',
+#         unsafe_allow_html=True
+#     )
+
+#     fig, ax = plt.subplots(figsize=(14,7))
+
+#     fig.patch.set_facecolor("#020617")
+#     ax.set_facecolor("#020617")
+
+#     contagem = df_filtrado["setor"].value_counts()
+
+#     sn.barplot(
+#         x=contagem.values,
+#         y=contagem.index,
+#         palette="blend:#00e5ff,#7c3aed",
+#         ax=ax
+#     )
+
+#     # REMOVE BORDAS
+#     ax.spines['top'].set_visible(False)
+#     ax.spines['right'].set_visible(False)
+#     ax.spines['left'].set_visible(False)
+#     ax.spines['bottom'].set_visible(False)
+
+#     # GRID
+#     ax.grid(
+#         axis='x',
+#         linestyle='--',
+#         alpha=0.15
+#     )
+
+#     # TEXTO
+#     ax.tick_params(
+#         colors='white',
+#         labelsize=12
+#     )
+
+#     ax.set_xlabel(
+#         "Quantidade",
+#         color="white",
+#         fontsize=13
+#     )
+
+#     ax.set_ylabel("")
+
+#     ax.set_title(
+#         "Quantidade de Empresas por Setor",
+#         color="white",
+#         fontsize=18,
+#         pad=20
+#     )
+
+#     # VALORES NAS BARRAS
+#     for i, v in enumerate(contagem.values):
+
+#         ax.text(
+#             v + 0.3,
+#             i,
+#             str(v),
+#             color='white',
+#             va='center',
+#             fontsize=11
+#         )
+
+#     plt.tight_layout()
+
+#     st.pyplot(fig)
+
+# # ─────────────────────────────────────────────
+# # DONUT CHART
+# # ─────────────────────────────────────────────
+# with tabs[2]:
+
+#     st.markdown(
+#         '<div class="section-title">Distribuição dos Setores</div>',
+#         unsafe_allow_html=True
+#     )
+
+#     fig, ax = plt.subplots(figsize=(10,10))
+
+#     fig.patch.set_facecolor("#020617")
+#     ax.set_facecolor("#020617")
+
+#     setores_count = df_filtrado["setor"].value_counts()
+
+#     cores = sn.color_palette(
+#         "blend:#00e5ff,#7c3aed",
+#         len(setores_count)
+#     )
+
+#     wedges, texts, autotexts = ax.pie(
+#         setores_count,
+#         labels=None,
+#         autopct='%1.1f%%',
+#         startangle=90,
+#         pctdistance=0.82,
+#         colors=cores,
+#         wedgeprops=dict(
+#             width=0.35,
+#             edgecolor="#020617",
+#             linewidth=2
+#         )
+#     )
+
+#     # TEXTO %
+#     for autotext in autotexts:
+
+#         autotext.set_color("white")
+#         autotext.set_fontsize(13)
+#         autotext.set_weight("bold")
+
+#     # CENTRO
+#     centre_circle = plt.Circle(
+#         (0,0),
+#         0.58,
+#         fc='#020617'
+#     )
+
+#     fig.gca().add_artist(centre_circle)
+
+#     # LEGENDA
+#     ax.legend(
+#         wedges,
+#         setores_count.index,
+#         title="Setores",
+#         loc="center left",
+#         bbox_to_anchor=(1, 0.5),
+#         frameon=False,
+#         labelcolor="white",
+#         title_fontsize=14,
+#         fontsize=12
+#     )
+
+#     plt.tight_layout()
+
+#     st.pyplot(fig)
+
+# # ─────────────────────────────────────────────
+# # HISTOGRAMA
+# # ─────────────────────────────────────────────
+# with tabs[3]:
+
+#     st.markdown(
+#         '<div class="section-title">Distribuição do ROE</div>',
+#         unsafe_allow_html=True
+#     )
+
+#     fig, ax = plt.subplots(figsize=(12,6))
+
+#     fig.patch.set_facecolor("#020617")
+#     ax.set_facecolor("#020617")
+
+#     sn.histplot(
+#         df_filtrado["roe"],
+#         bins=25,
+#         kde=True,
+#         color="#00e5ff",
+#         ax=ax
+#     )
+
+#     ax.spines['top'].set_visible(False)
+#     ax.spines['right'].set_visible(False)
+
+#     ax.tick_params(colors='white')
+
+#     ax.set_title(
+#         "Distribuição de Retorno sobre Patrimônio",
+#         color="white",
+#         fontsize=16
+#     )
+
+#     plt.tight_layout()
+
+#     st.pyplot(fig)
+
 """
 Dashboard Financeiro Premium
 Versão Ultra Moderna
@@ -5,7 +588,7 @@ Versão Ultra Moderna
 
 import streamlit as st
 import pandas as pd
-import seaborn as sn
+import seaborn as sns  # ← convenção padrão
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -20,298 +603,87 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────
-# CSS PREMIUM
+# CSS PREMIUM (sem alterações)
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
-
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap');
-
-* {
-    font-family: 'Space Grotesk', sans-serif;
-}
-
-/* FUNDO */
+* { font-family: 'Space Grotesk', sans-serif; }
 .stApp {
-
-    background:
-        radial-gradient(circle at top left, #111827 0%, #050816 45%),
-        radial-gradient(circle at bottom right, #0f172a 0%, #020617 40%);
-
-    color: white;
-    overflow-x: hidden;
+    background: radial-gradient(circle at top left, #111827 0%, #050816 45%),
+                radial-gradient(circle at bottom right, #0f172a 0%, #020617 40%);
+    color: white; overflow-x: hidden;
 }
-
-/* GRID NO FUNDO */
 .stApp::before {
-
-    content: "";
-
-    position: fixed;
-
-    width: 100%;
-    height: 100%;
-
+    content: ""; position: fixed; width: 100%; height: 100%;
     background-image:
         linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-
-    background-size: 40px 40px;
-
-    z-index: -1;
+    background-size: 40px 40px; z-index: -1;
 }
-
-/* CURSOR */
-html, body, [class*="css"] {
-    cursor: crosshair;
-}
-
-/* SIDEBAR */
+html, body, [class*="css"] { cursor: crosshair; }
 [data-testid="stSidebar"] {
-
     background: rgba(17,24,39,0.78);
-
     backdrop-filter: blur(20px);
-
     border-right: 1px solid rgba(0,229,255,0.15);
 }
-
-/* TÍTULO */
 .main-title {
-
-    font-size: 3rem;
-    font-weight: 700;
-
-    background: linear-gradient(
-        90deg,
-        #00e5ff,
-        #7c3aed,
-        #00e5ff
-    );
-
+    font-size: 3rem; font-weight: 700;
+    background: linear-gradient(90deg, #00e5ff, #7c3aed, #00e5ff);
     background-size: 200% auto;
-
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-
-    animation: shine 6s linear infinite;
-
-    margin-bottom: 0;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: shine 6s linear infinite; margin-bottom: 0;
 }
-
-@keyframes shine {
-
-    to {
-        background-position: 200% center;
-    }
-}
-
-/* SUBTÍTULO */
-.main-subtitle {
-
-    color: #94a3b8;
-
-    margin-bottom: 2rem;
-
-    font-size: 1.05rem;
-}
-
-/* KPI CARDS */
+@keyframes shine { to { background-position: 200% center; } }
+.main-subtitle { color: #94a3b8; margin-bottom: 2rem; font-size: 1.05rem; }
 .kpi-card {
-
     background: rgba(17,24,39,0.55);
-
     border: 1px solid rgba(255,255,255,0.08);
-
-    backdrop-filter: blur(18px);
-
-    border-radius: 24px;
-
-    padding: 1.7rem;
-
-    transition: 0.35s ease;
-
-    box-shadow:
-        0 0 30px rgba(0,229,255,0.04);
+    backdrop-filter: blur(18px); border-radius: 24px; padding: 1.7rem;
+    transition: 0.35s ease; box-shadow: 0 0 30px rgba(0,229,255,0.04);
 }
-
 .kpi-card:hover {
-
     transform: translateY(-8px) scale(1.02);
-
     border: 1px solid rgba(0,229,255,0.45);
-
-    box-shadow:
-        0 0 25px rgba(0,229,255,0.25),
-        0 0 60px rgba(124,58,237,0.15);
+    box-shadow: 0 0 25px rgba(0,229,255,0.25), 0 0 60px rgba(124,58,237,0.15);
 }
-
-/* TEXTO KPI */
-.kpi-label {
-
-    color: #94a3b8;
-
-    font-size: 0.85rem;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1px;
-}
-
-.kpi-value {
-
-    font-size: 2.3rem;
-
-    font-weight: 700;
-
-    color: white;
-
-    margin-top: 10px;
-}
-
-/* TÍTULOS DE SESSÃO */
-.section-title {
-
-    font-size: 1.2rem;
-
-    font-weight: 600;
-
-    margin-bottom: 1rem;
-
-    color: #00e5ff;
-}
-
-/* TABS */
-.stTabs [data-baseweb="tab-list"] {
-
-    gap: 12px;
-}
-
+.kpi-label { color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+.kpi-value { font-size: 2.3rem; font-weight: 700; color: white; margin-top: 10px; }
+.section-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; color: #00e5ff; }
+.stTabs [data-baseweb="tab-list"] { gap: 12px; }
 .stTabs [data-baseweb="tab"] {
-
-    background: rgba(255,255,255,0.04);
-
-    border-radius: 14px;
-
-    padding: 10px 20px;
-
-    transition: 0.3s;
+    background: rgba(255,255,255,0.04); border-radius: 14px; padding: 10px 20px; transition: 0.3s;
 }
-
 .stTabs [aria-selected="true"] {
-
-    background: linear-gradient(
-        90deg,
-        #00e5ff,
-        #7c3aed
-    );
-
-    color: white !important;
+    background: linear-gradient(90deg, #00e5ff, #7c3aed); color: white !important;
 }
-
-/* DATAFRAME */
-[data-testid="stDataFrame"] {
-
-    border-radius: 20px;
-
-    overflow: hidden;
-
-    border: 1px solid rgba(255,255,255,0.08);
-}
-
-/* MULTISELECT PREMIUM */
+[data-testid="stDataFrame"] { border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
 [data-baseweb="select"] > div {
-
     background: rgba(2,6,23,0.88) !important;
-
     border: 1px solid rgba(255,255,255,0.08) !important;
-
-    border-radius: 18px !important;
-
-    min-height: 65px;
-
-    padding-top: 6px;
-    padding-bottom: 6px;
-
-    transition: 0.3s;
+    border-radius: 18px !important; min-height: 65px;
+    padding-top: 6px; padding-bottom: 6px; transition: 0.3s;
 }
-
-/* HOVER SELECT */
 [data-baseweb="select"] > div:hover {
-
     border: 1px solid rgba(0,229,255,0.45) !important;
-
-    box-shadow:
-        0 0 15px rgba(0,229,255,0.18);
+    box-shadow: 0 0 15px rgba(0,229,255,0.18);
 }
-
-/* TAGS */
 [data-baseweb="tag"] {
-
-    background: linear-gradient(
-        135deg,
-        #7c3aed,
-        #00e5ff
-    ) !important;
-
-    border-radius: 12px !important;
-
-    border: none !important;
-
-    color: white !important;
+    background: linear-gradient(135deg, #7c3aed, #00e5ff) !important;
+    border-radius: 12px !important; border: none !important; color: white !important;
 }
-
-/* DROPDOWN */
 div[role="listbox"] {
-
-    background: rgba(15,23,42,0.98) !important;
-
-    border-radius: 18px !important;
-
-    border: 1px solid rgba(255,255,255,0.08);
-
-    padding: 8px;
-
-    backdrop-filter: blur(20px);
-
-    z-index: 999999 !important;
+    background: rgba(15,23,42,0.98) !important; border-radius: 18px !important;
+    border: 1px solid rgba(255,255,255,0.08); padding: 8px;
+    backdrop-filter: blur(20px); z-index: 999999 !important;
 }
-
-/* ITENS */
-div[role="option"] {
-
-    border-radius: 12px;
-
-    margin-bottom: 4px;
-}
-
-/* HOVER DOS ITENS */
-div[role="option"]:hover {
-
-    background: rgba(0,229,255,0.12) !important;
-}
-
-/* SCROLLBAR */
-::-webkit-scrollbar {
-
-    width: 10px;
-}
-
+div[role="option"] { border-radius: 12px; margin-bottom: 4px; }
+div[role="option"]:hover { background: rgba(0,229,255,0.12) !important; }
+::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-thumb {
-
-    background: linear-gradient(
-        #00e5ff,
-        #7c3aed
-    );
-
-    border-radius: 20px;
+    background: linear-gradient(#00e5ff, #7c3aed); border-radius: 20px;
 }
-
-/* REMOVE STREAMLIT */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
-
+#MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -336,201 +708,118 @@ setores = st.sidebar.multiselect(
     placeholder="Escolha os setores..."
 )
 
-# FILTRO
 df_filtrado = df[df["setor"].isin(setores)]
 
 # ─────────────────────────────────────────────
 # TÍTULO
 # ─────────────────────────────────────────────
-st.markdown(
-    '<div class="main-title">💎 Dashboard Financeiro</div>',
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    '<div class="main-subtitle">Análise avançada de performance corporativa</div>',
-    unsafe_allow_html=True
-)
+st.markdown('<div class="main-title">💎 Dashboard Financeiro</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-subtitle">Análise avançada de performance corporativa</div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
-# KPIs
+# GUARDA CONTRA SELEÇÃO VAZIA  ← novo
+# ─────────────────────────────────────────────
+if df_filtrado.empty:
+    st.warning("⚠️ Nenhum setor selecionado. Escolha ao menos um no menu lateral.")
+    st.stop()
+
+# ─────────────────────────────────────────────
+# KPIs  ← BUG CORRIGIDO (faltava fechar st.markdown)
 # ─────────────────────────────────────────────
 c1, c2, c3, c4 = st.columns(4)
 
 kpis = [
-    ("Empresas", len(df_filtrado)),
-    ("Setores", df_filtrado["setor"].nunique()),
-    ("ROE Médio", f'{df_filtrado["roe"].mean():.2f}%'),
-    ("ROE Máximo", f'{df_filtrado["roe"].max():.2f}%')
+    ("Empresas",    len(df_filtrado)),
+    ("Setores",     df_filtrado["setor"].nunique()),
+    ("ROE Médio",   f'{df_filtrado["roe"].mean():.2f}%'),
+    ("ROE Máximo",  f'{df_filtrado["roe"].max():.2f}%'),
 ]
 
-for col, (label, value) in zip([c1,c2,c3,c4], kpis):
-
+for col, (label, value) in zip([c1, c2, c3, c4], kpis):
     with col:
-
         st.markdown(f"""
         <div class="kpi-card">
-
             <div class="kpi-label">{label}</div>
-
             <div class="kpi-value">{value}</div>
-
         </div>
-        """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)  # ← estava faltando esta linha inteira
 
 # ─────────────────────────────────────────────
 # TABS
 # ─────────────────────────────────────────────
-tabs = st.tabs([
-    "📋 Dados",
-    "📊 Setores",
-    "🥧 Distribuição",
-    "📈 ROE"
-])
+tabs = st.tabs(["📋 Dados", "📊 Setores", "🥧 Distribuição", "📈 ROE"])
 
 # ─────────────────────────────────────────────
 # TABELA
 # ─────────────────────────────────────────────
 with tabs[0]:
-
-    st.markdown(
-        '<div class="section-title">Base Financeira</div>',
-        unsafe_allow_html=True
-    )
-
-    st.dataframe(
-        df_filtrado,
-        use_container_width=True,
-        height=520
-    )
+    st.markdown('<div class="section-title">Base Financeira</div>', unsafe_allow_html=True)
+    st.dataframe(df_filtrado, use_container_width=True, height=520)
 
 # ─────────────────────────────────────────────
 # GRÁFICO DE BARRAS
 # ─────────────────────────────────────────────
 with tabs[1]:
+    st.markdown('<div class="section-title">Empresas por Setor</div>', unsafe_allow_html=True)
 
-    st.markdown(
-        '<div class="section-title">Empresas por Setor</div>',
-        unsafe_allow_html=True
-    )
-
-    fig, ax = plt.subplots(figsize=(14,7))
-
+    fig, ax = plt.subplots(figsize=(14, 7))
     fig.patch.set_facecolor("#020617")
     ax.set_facecolor("#020617")
 
     contagem = df_filtrado["setor"].value_counts()
 
-    sn.barplot(
-        x=contagem.values,
-        y=contagem.index,
-        palette="blend:#00e5ff,#7c3aed",
-        ax=ax
-    )
+    sns.barplot(x=contagem.values, y=contagem.index, palette="blend:#00e5ff,#7c3aed", ax=ax)
 
-    # REMOVE BORDAS
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
 
-    # GRID
-    ax.grid(
-        axis='x',
-        linestyle='--',
-        alpha=0.15
-    )
+    ax.grid(axis='x', linestyle='--', alpha=0.15)
+    ax.tick_params(colors='white', labelsize=12)
+    ax.set_xlabel("Quantidade", color="white", fontsize=13)
+    ax.set_ylabel("", color="white")
+    ax.set_title("Quantidade de Empresas por Setor", color="white", fontsize=18, pad=20)
 
-    # TEXTO
-    ax.tick_params(
-        colors='white',
-        labelsize=12
-    )
-
-    ax.set_xlabel(
-        "Quantidade",
-        color="white",
-        fontsize=13
-    )
-
-    ax.set_ylabel("")
-
-    ax.set_title(
-        "Quantidade de Empresas por Setor",
-        color="white",
-        fontsize=18,
-        pad=20
-    )
-
-    # VALORES NAS BARRAS
     for i, v in enumerate(contagem.values):
-
-        ax.text(
-            v + 0.3,
-            i,
-            str(v),
-            color='white',
-            va='center',
-            fontsize=11
-        )
+        ax.text(v + 0.3, i, str(v), color='white', va='center', fontsize=11)
 
     plt.tight_layout()
-
     st.pyplot(fig)
 
 # ─────────────────────────────────────────────
-# DONUT CHART
+# DONUT CHART  ← LABELS CORRIGIDOS
 # ─────────────────────────────────────────────
 with tabs[2]:
+    st.markdown('<div class="section-title">Distribuição dos Setores</div>', unsafe_allow_html=True)
 
-    st.markdown(
-        '<div class="section-title">Distribuição dos Setores</div>',
-        unsafe_allow_html=True
-    )
-
-    fig, ax = plt.subplots(figsize=(10,10))
-
+    fig, ax = plt.subplots(figsize=(10, 10))
     fig.patch.set_facecolor("#020617")
     ax.set_facecolor("#020617")
 
     setores_count = df_filtrado["setor"].value_counts()
+    cores = sns.color_palette("blend:#00e5ff,#7c3aed", len(setores_count))
 
-    cores = sn.color_palette(
-        "blend:#00e5ff,#7c3aed",
-        len(setores_count)
-    )
+    # ← Oculta o % de fatias menores que 3% para evitar sobreposição
+    def autopct_limiar(pct):
+        return f"{pct:.1f}%" if pct >= 3.0 else ""
 
     wedges, texts, autotexts = ax.pie(
         setores_count,
         labels=None,
-        autopct='%1.1f%%',
+        autopct=autopct_limiar,       # ← função customizada
         startangle=90,
-        pctdistance=0.82,
+        pctdistance=0.78,             # ← recuado para caber dentro da fatia
         colors=cores,
-        wedgeprops=dict(
-            width=0.35,
-            edgecolor="#020617",
-            linewidth=2
-        )
+        wedgeprops=dict(width=0.40, edgecolor="#020617", linewidth=2)  # ← anel um pouco mais largo
     )
 
-    # TEXTO %
     for autotext in autotexts:
-
         autotext.set_color("white")
-        autotext.set_fontsize(13)
+        autotext.set_fontsize(12)
         autotext.set_weight("bold")
 
-    # CENTRO
-    centre_circle = plt.Circle(
-        (0,0),
-        0.58,
-        fc='#020617'
-    )
-
+    centre_circle = plt.Circle((0, 0), 0.58, fc='#020617')
     fig.gca().add_artist(centre_circle)
 
-    # LEGENDA
     ax.legend(
         wedges,
         setores_count.index,
@@ -544,46 +833,36 @@ with tabs[2]:
     )
 
     plt.tight_layout()
-
     st.pyplot(fig)
 
 # ─────────────────────────────────────────────
-# HISTOGRAMA
+# HISTOGRAMA  ← cores dos eixos corrigidas
 # ─────────────────────────────────────────────
 with tabs[3]:
+    st.markdown('<div class="section-title">Distribuição do ROE</div>', unsafe_allow_html=True)
 
-    st.markdown(
-        '<div class="section-title">Distribuição do ROE</div>',
-        unsafe_allow_html=True
-    )
-
-    fig, ax = plt.subplots(figsize=(12,6))
-
+    fig, ax = plt.subplots(figsize=(12, 6))
     fig.patch.set_facecolor("#020617")
     ax.set_facecolor("#020617")
 
-    sn.histplot(
-        df_filtrado["roe"],
-        bins=25,
-        kde=True,
-        color="#00e5ff",
-        ax=ax
-    )
+    sns.histplot(df_filtrado["roe"], bins=25, kde=True, color="#00e5ff", ax=ax)
 
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
+    for spine in ["top", "right"]:
+        ax.spines[spine].set_visible(False)
+    for spine in ["left", "bottom"]:
+        ax.spines[spine].set_color("rgba(255,255,255,0.15)")  # ← sutil, não some
 
     ax.tick_params(colors='white')
-
-    ax.set_title(
-        "Distribuição de Retorno sobre Patrimônio",
-        color="white",
-        fontsize=16
-    )
+    ax.set_xlabel("ROE (%)", color="white", fontsize=13)   # ← estava faltando
+    ax.set_ylabel("Frequência", color="white", fontsize=13) # ← estava faltando
+    ax.set_title("Distribuição de Retorno sobre Patrimônio", color="white", fontsize=16)
 
     plt.tight_layout()
-
     st.pyplot(fig)
+
+
+
+
 
 
 # #                         # Código da Aula 14/05 
