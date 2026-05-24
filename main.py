@@ -1034,7 +1034,7 @@ if df_filtrado.empty:
 # ─────────────────────────────────────────────
 # KPIs
 # ─────────────────────────────────────────────
-c1, c2, c3, c4 = st.columns(4)
+c1, c2, c3, c4 = st.columns(4, gap="large")
  
 kpis = [
     ("Empresas",   len(df_filtrado)),
