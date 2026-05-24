@@ -795,16 +795,12 @@ div[role="option"]:hover {
 /* REMOVE STREAMLIT */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
-
-/* Esconde só o botão de deploy do header, mantém o toggle da sidebar */
 [data-testid="stToolbar"] {visibility: hidden;}
-[data-testid="stSidebarCollapsedControl"] {
-    visibility: visible !important;
-    display: block !important;
-    position: fixed !important;
-    top: 14px !important;
-    left: 14px !important;
-    z-index: 999999 !important;
+
+/* Esconde o botão de fechar DENTRO da sidebar — ela nunca recolhe */
+[data-testid="stSidebarCollapseButton"] {
+    display: none !important;
+}
 } 
  
 /* ═══════════════════════════════════════════
