@@ -795,6 +795,9 @@ div[role="option"]:hover {
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: hidden;}
+[data-testid="stSidebarCollapsedControl"] {
+    visibility: visible !important;
+}
  
 /* ═══════════════════════════════════════════
    SIDEBAR APRIMORADA
